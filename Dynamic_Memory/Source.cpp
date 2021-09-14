@@ -5,7 +5,7 @@ using std::endl;
 
 void FillRand(int arr[], const unsigned int n);
 void Print(int arr[], const unsigned int n);
-int* push_back(int arr[], int& n, int value);
+void push_back(int** arr, int& n, int value);//принимаем указатель на массив по указателю
 int* push_front(int arr[], int& n, int value);
 int* push_insert(int arr[], int& n, int value, int index);
 int* pop_back(int arr[], int& n);
@@ -22,11 +22,11 @@ void main()
 	Print(arr, n);
 	int value;
 	cout << "Введите добавляемое в конец значение: "; cin >> value;
-	arr=push_back(arr, n, value);
+	push_back(&arr, n, value);
 	cout << "Массив с добавленным в конце элементом: " << endl;
 	Print(arr, n);
 
-	cout << "Введите добавляемое в начало значение: "; cin >> value;
+	/*cout << "Введите добавляемое в начало значение: "; cin >> value;
 	arr = push_front(arr, n, value);
 	cout << "Массив с добавленным в начало элементом: " << endl;
 	Print(arr, n);
@@ -48,7 +48,7 @@ void main()
 
 	cout << "Введите индекс для удаляемого значения: "; cin >> index;
 	arr = erase(arr, n, index);
-	Print(arr, n);
+	Print(arr, n);*/
 
 	delete[]arr;
 }
@@ -68,25 +68,26 @@ void Print(int arr[], const unsigned int n)
 	}
 	cout << endl;
 }
-int* push_back(int arr[], int& n, int value)
+void push_back(int** arr, int& n, int value)
 {
+	cout << typeid(arr).name() << endl;
 	//добавление элемента в массив
 	//1)создаем буферный массив нужного размера
 	int* buffer = new int[n + 1];
 	//копируем исходный массив в буферный
 	for (int i = 0; i < n; i++)
 	{
-		buffer[i] = arr[i];
+		buffer[i] = (*arr)[i];
 	}
 	//3)удалить исходный массив
-	delete[] arr;
+	delete[] *arr;
 	//4)подменем исходный массив новым (буферным) массивом, за счет подмены адреса
-	arr = buffer;
+	*arr= buffer;
 	//5)Только после всех этих действий можно добавить значние в конец массива
-	arr[n] = value;
+	(*arr)[n] = value;
 	//6)После добавления элемента в массив количество его элементов увеличивается на 1
 	n++;
-	return arr;
+	
 }
 int* push_front(int arr[], int& n, int value)
 {
@@ -118,7 +119,7 @@ int* push_insert(int arr[], int& n, int value, int index)
 }
 int* pop_back(int arr[], int& n)
 {
-	int* buffer = new int[n - 1];
+	int* buffer = new int[n-1];
 	for (int i = 0; i < n - 1; i++)
 	{
 		buffer[i] = arr[i];
