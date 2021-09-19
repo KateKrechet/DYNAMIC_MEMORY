@@ -6,11 +6,11 @@ using std::endl;
 void FillRand(int arr[], const unsigned int n);
 void Print(int arr[], const unsigned int n);
 void push_back(int** arr, int& n, int value);//принимаем указатель на массив по указателю
-int* push_front(int arr[], int& n, int value);
-int* push_insert(int arr[], int& n, int value, int index);
-int* pop_back(int arr[], int& n);
-int* pop_front(int arr[], int& n);
-int* erase(int arr[], int& n, int index);
+void push_front(int** arr, int& n, int value);
+int push_insert(int** arr, int& n, int value, int index);
+void pop_back(int** arr, int& n);
+void pop_front(int** arr, int& n);
+int erase(int** arr, int& n, int index);
 
 void main()
 {
@@ -26,29 +26,29 @@ void main()
 	cout << "Массив с добавленным в конце элементом: " << endl;
 	Print(arr, n);
 
-	/*cout << "Введите добавляемое в начало значение: "; cin >> value;
-	arr = push_front(arr, n, value);
+	cout << "Введите добавляемое в начало значение: "; cin >> value;
+	push_front(&arr, n, value);
 	cout << "Массив с добавленным в начало элементом: " << endl;
 	Print(arr, n);
 
 	int index;
 	cout << "Введите добавляемое значение: "; cin >> value;
-	cout << "Введите индекс для вставки значения: "; cin >> index;
-	arr = push_insert(arr, n, value,index);
+	cout << "Введите значение индекса: "; cin >> index;
+	push_insert(&arr, n, value, index);
 	cout << "Массив с добавленным по номеру индекса значением: " << endl;
 	Print(arr, n);
-	
-	arr = pop_back(arr, n);
+
+	pop_back(&arr, n);
 	cout << "Массив с удаленным последним элементом массива: " << endl;
 	Print(arr, n);
 
-	arr = pop_front(arr, n);
+	pop_front(&arr, n);
 	cout << "Массив с удаленным первым элементом массива: " << endl;
 	Print(arr, n);
 
 	cout << "Введите индекс для удаляемого значения: "; cin >> index;
-	arr = erase(arr, n, index);
-	Print(arr, n);*/
+	erase(&arr, n, index);
+	Print(arr, n);
 
 	delete[]arr;
 }
@@ -70,7 +70,7 @@ void Print(int arr[], const unsigned int n)
 }
 void push_back(int** arr, int& n, int value)
 {
-	cout << typeid(arr).name() << endl;
+	//cout << typeid(arr).name() << endl;
 	//добавление элемента в массив
 	//1)создаем буферный массив нужного размера
 	int* buffer = new int[n + 1];
@@ -80,78 +80,68 @@ void push_back(int** arr, int& n, int value)
 		buffer[i] = (*arr)[i];
 	}
 	//3)удалить исходный массив
-	delete[] *arr;
+	delete[] * arr;
 	//4)подменем исходный массив новым (буферным) массивом, за счет подмены адреса
-	*arr= buffer;
+	*arr = buffer;
 	//5)Только после всех этих действий можно добавить значние в конец массива
 	(*arr)[n] = value;
 	//6)После добавления элемента в массив количество его элементов увеличивается на 1
 	n++;
-	
+
 }
-int* push_front(int arr[], int& n, int value)
+void push_front(int** arr, int& n, int value)
 {
 	int* buffer = new int[n + 1];
 	for (int i = 0; i < n; i++)
 	{
-		buffer[i + 1] = arr[i];
+		buffer[i + 1] = (*arr)[i];
 	}
-	delete[]arr;
-	arr = buffer;
-	arr[0] = value;
+	delete[] * arr;
+	*arr = buffer;
+	(*arr)[0] = value;
 	n++;
-	return arr;
 }
-int* push_insert(int arr[], int& n, int value, int index)
+int push_insert(int** arr, int& n, int value, int index)
 {
 	int* buffer = new int[n + 1];
-	if (index >= n) return arr;
+	if (index >= n) return **arr;
 	for (int i = 0, k = 0; i < n; i++, k++)
 	{
 		if (i == index)k++;
-		buffer[k] = arr[i];
+		buffer[k] = (*arr)[i];
 	}
-	delete[] arr;
-	arr = buffer;
-	arr[index] = value;
+	delete[] * arr;
+	*arr = buffer;
+	(*arr)[index] = value;
 	n++;
-	return arr;
+	return **arr;
 }
-int* pop_back(int arr[], int& n)
+void pop_back(int** arr, int& n)
 {
-	int* buffer = new int[n-1];
-	for (int i = 0; i < n - 1; i++)
-	{
-		buffer[i] = arr[i];
-	}
-	delete[]arr;
-	arr = buffer;
-	n--;
-	return arr;
+	int* buffer = new int[--n];
+	for (int i = 0; i < n; i++)buffer[i] = (*arr)[i];
+	delete[] *arr;
+	*arr = buffer;
+
 }
-int* pop_front(int arr[], int& n)
+void pop_front(int** arr, int& n)
 {
-	int* buffer = new int[n - 1];
-	for (int i = 0; i < n; i++)
-	{
-		buffer[i] = arr[i + 1];
-	}
-	delete[] arr;
-	arr = buffer;
-	n--;
-	return arr;
+	int* buffer = new int[--n];
+	for (int i = 0; i < n; i++)buffer[i] = (*arr)[i+1];
+	delete[] * arr;
+	*arr = buffer;
 }
-int* erase(int arr[], int& n, int index)
+int erase(int** arr, int& n, int index)
 {
-	if (index > (n - 1)) return arr;
-	int* buffer = new int[n - 1];
+	if (index >= n) return **arr;
+	int* buffer = new int[--n];
 	for (int i = 0, k = 0; i < n; i++)
 	{
 		if (i == index) k++;
-		buffer[i] = arr[i + k];
+		buffer[i] = (*arr)[i + k];
 	}
-	delete[]arr;
-	arr = buffer;
-	n--;
-	return arr;
+	delete[]*arr;
+	*arr = buffer;
+	return **arr;
+	
 }
