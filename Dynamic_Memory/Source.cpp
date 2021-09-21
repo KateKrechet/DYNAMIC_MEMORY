@@ -5,7 +5,7 @@ using std::endl;
 
 void FillRand(int arr[], const unsigned int n);
 void Print(int arr[], const unsigned int n);
-int* push_back(int arr[], int& n, int value);
+void push_back(int*& arr, int& n, int value);
 int* push_front(int arr[], int& n, int value);
 int* push_insert(int arr[], int& n, int value, int index);
 int* pop_back(int arr[], int& n);
@@ -22,7 +22,7 @@ void main()
 	Print(arr, n);
 	int value;
 	cout << "Введите добавляемое в конец значение: "; cin >> value;
-	arr=push_back(arr, n, value);
+	push_back(arr, n, value);
 	cout << "Массив с добавленным в конце элементом: " << endl;
 	Print(arr, n);
 
@@ -34,10 +34,10 @@ void main()
 	int index;
 	cout << "Введите добавляемое значение: "; cin >> value;
 	cout << "Введите индекс для вставки значения: "; cin >> index;
-	arr = push_insert(arr, n, value,index);
+	arr = push_insert(arr, n, value, index);
 	cout << "Массив с добавленным по номеру индекса значением: " << endl;
 	Print(arr, n);
-	
+
 	arr = pop_back(arr, n);
 	cout << "Массив с удаленным последним элементом массива: " << endl;
 	Print(arr, n);
@@ -68,7 +68,7 @@ void Print(int arr[], const unsigned int n)
 	}
 	cout << endl;
 }
-int* push_back(int arr[], int& n, int value)
+void push_back(int*& arr, int& n, int value)
 {
 	//добавление элемента в массив
 	//1)создаем буферный массив нужного размера
@@ -86,7 +86,6 @@ int* push_back(int arr[], int& n, int value)
 	arr[n] = value;
 	//6)После добавления элемента в массив количество его элементов увеличивается на 1
 	n++;
-	return arr;
 }
 int* push_front(int arr[], int& n, int value)
 {
