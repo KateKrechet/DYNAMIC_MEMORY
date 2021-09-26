@@ -3,8 +3,13 @@ using std::cin;
 using std::cout;
 using std::endl;
 
-void FillRand(int arr[], const unsigned int n);
+int** allocate(const unsigned int rows, const unsigned int cols);
+void clear(int** arr, const unsigned int rows);
+
+void FillRand(int arr[], const unsigned int n, int minRand=0, int maxRand=100);
+void FillRand(int** arr, const unsigned int rows, const unsigned int cols);
 void Print(int arr[], const unsigned int n);
+void Print(int** arr, const unsigned int rows, const unsigned int cols);
 int* push_back(int arr[], int& n, int value);
 int* push_front(int arr[], int& n, int value);
 int* push_insert(int arr[], int& n, int value, int index);
@@ -12,9 +17,16 @@ int* pop_back(int arr[], int& n);
 int* pop_front(int arr[], int& n);
 int* erase(int arr[], int& n, int index);
 
+int** push_row_back(int** arr, unsigned int &rows, unsigned int cols);
+
+
+//#define DYNAMIC_MEMORY_1
+#define DYNAMIC_MEMORY_2
+
 void main()
 {
 	setlocale(LC_ALL, "Russian");
+#ifdef DYNAMIC_MEMORY_1
 	int n;
 	cout << "Введите размер массива: "; cin >> n;
 	int* arr = new int[n];
@@ -22,7 +34,7 @@ void main()
 	Print(arr, n);
 	int value;
 	cout << "Введите добавляемое в конец значение: "; cin >> value;
-	arr=push_back(arr, n, value);
+	arr = push_back(arr, n, value);
 	cout << "Массив с добавленным в конце элементом: " << endl;
 	Print(arr, n);
 
@@ -34,10 +46,10 @@ void main()
 	int index;
 	cout << "Введите добавляемое значение: "; cin >> value;
 	cout << "Введите индекс для вставки значения: "; cin >> index;
-	arr = push_insert(arr, n, value,index);
+	arr = push_insert(arr, n, value, index);
 	cout << "Массив с добавленным по номеру индекса значением: " << endl;
 	Print(arr, n);
-	
+
 	arr = pop_back(arr, n);
 	cout << "Массив с удаленным последним элементом массива: " << endl;
 	Print(arr, n);
@@ -51,12 +63,61 @@ void main()
 	Print(arr, n);
 
 	delete[]arr;
+#endif // DYNAMIC_MEMORY_1
+	unsigned int rows;
+	unsigned int cols;
+	cout << "Введите количество строк: "; cin >> rows;
+	cout << "Введите количество элементов строки: "; cin >> cols;
+	int** arr = allocate(rows, cols);
+	FillRand(arr, rows, cols);
+	Print(arr, rows, cols);
+	cout << "ДДМ с добавленной строкой: " << endl;
+	arr=push_row_back(arr, rows, cols);
+	FillRand(arr[rows-1], cols, 0, 1000);//заполняем значениями только новую добавленную строку
+	Print(arr, rows, cols);
+	clear(arr, rows);
 }
-void FillRand(int arr[], const unsigned int n)
+
+int** allocate(const unsigned int rows, const unsigned int cols)
+{
+	//Объявление двумерного динамического массива:
+		//1) Объявляем указатель на указатель и сохрнаяем в него адрес массива указателей
+
+	int** arr = new int* [rows];
+	//2) Создаем строки ДДМ:
+	for (int i = 0; i < rows; i++)
+	{
+		arr[i] = new int[cols] {};
+	}
+	return arr;
+}
+void clear(int** arr, const unsigned int rows)
+{
+	//3) Удаление ДДМ
+	//Удаляем строки
+	for (int i = 0; i < rows; i++)
+	{
+		delete arr[i];
+	}
+	//Удаляем массив указателей
+	delete[] arr;
+}
+void FillRand(int arr[], const unsigned int n, int minRand, int maxRand)
 {
 	for (int i = 0; i < n; i++)
 	{
-		arr[i] = rand() % 100;
+		arr[i] = rand() % (maxRand-minRand)+minRand;
+	}
+
+}
+void FillRand(int** arr, const unsigned int rows, const unsigned int cols)
+{
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < cols; j++)
+		{
+			arr[i][j] = rand() % 100;
+		}
 	}
 }
 void Print(int arr[], const unsigned int n)
@@ -67,6 +128,18 @@ void Print(int arr[], const unsigned int n)
 
 	}
 	cout << endl;
+}
+
+void Print(int** arr, const unsigned int rows, const unsigned int cols)
+{
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < cols; j++)
+		{
+			cout << *(*(arr+i)+j)<< "\t";
+		}
+		cout << endl;
+	}
 }
 int* push_back(int arr[], int& n, int value)
 {
@@ -152,5 +225,21 @@ int* erase(int arr[], int& n, int index)
 	delete[]arr;
 	arr = buffer;
 	n--;
+	return arr;
+}
+
+int** push_row_back(int** arr, unsigned int &rows, unsigned int cols)
+{
+	//1)создаем буферный массив указателей
+	int** buffer = new int*[rows + 1]{};
+	//2) копируем адреса строк в буферный массив указателей
+	for (int i = 0; i < rows; i++)
+	{
+		buffer[i] = arr[i];
+	}
+	delete[] arr;
+	arr = buffer;
+	arr[rows] = new int[cols] {};
+	rows++;
 	return arr;
 }
