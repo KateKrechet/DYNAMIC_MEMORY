@@ -18,6 +18,12 @@ int* pop_front(int arr[], int& n);
 int* erase(int arr[], int& n, int index);
 
 int** push_row_back(int** arr, unsigned int &rows, unsigned int cols);
+int** push_row_front(int** arr, unsigned int& rows, unsigned int cols);
+int** push_row_insert(int** arr, unsigned int& rows, unsigned int cols,unsigned int index);
+int** pop_row_back(int** arr, unsigned int& rows, unsigned int cols);
+int** pop_row_front(int** arr, unsigned int& rows, unsigned int cols);
+int** pop_row_erase(int** arr, unsigned int& rows, unsigned int cols, unsigned int index);
+
 
 
 //#define DYNAMIC_MEMORY_1
@@ -71,9 +77,34 @@ void main()
 	int** arr = allocate(rows, cols);
 	FillRand(arr, rows, cols);
 	Print(arr, rows, cols);
-	cout << "ДДМ с добавленной строкой: " << endl;
+	cout << "ДДМ с добавленной в конец строкой: " << endl;
 	arr=push_row_back(arr, rows, cols);
 	FillRand(arr[rows-1], cols, 0, 1000);//заполняем значениями только новую добавленную строку
+	Print(arr, rows, cols);
+
+	cout << "ДДМ с добавленной в начало строкой: " << endl;
+	arr = push_row_front(arr, rows, cols);
+	FillRand(arr[0], cols, 0, 1000);//заполняем значениями только новую добавленную строку
+	Print(arr, rows, cols);
+	
+	int index;
+	cout << "Введите значение индекса для добавления строки: " << endl; cin >> index;
+	cout << "ДДМ с добавленной по индексу строкой: " << endl;
+	arr = push_row_insert(arr, rows, cols,index);
+	FillRand(arr[index], cols, 0, 1000);//заполняем значениями только новую добавленную строку
+	Print(arr, rows, cols);
+
+	cout << "ДДМ с с удаленной последней строкой: " << endl;
+	arr = pop_row_back(arr, rows, cols);
+	Print(arr, rows, cols);
+
+	cout << "ДДМ с с удаленной первой строкой: " << endl;
+	arr = pop_row_front(arr, rows, cols);
+	Print(arr, rows, cols);
+
+	cout << "Введите значение индекса для удаления строки: " << endl; cin >> index;
+	cout << "ДДМ с удаленной по индексу строкой: " << endl;
+	arr = pop_row_erase(arr, rows, cols, index);
 	Print(arr, rows, cols);
 	clear(arr, rows);
 }
@@ -241,5 +272,70 @@ int** push_row_back(int** arr, unsigned int &rows, unsigned int cols)
 	arr = buffer;
 	arr[rows] = new int[cols] {};
 	rows++;
+	return arr;
+}
+int** push_row_front(int** arr, unsigned int& rows, unsigned int cols)
+{
+	//1)создаем буферный массив указателей
+	int** buffer = new int* [rows + 1]{};
+	//2) копируем адреса строк в буферный массив указателей
+	for (int i = 0; i < rows; i++)
+	{
+		buffer[i+1] = arr[i];
+	}
+	delete[] arr;
+	arr = buffer;
+	arr[0] = new int[cols] {};
+	rows++;
+	return arr;
+}
+int** push_row_insert(int** arr, unsigned int& rows, unsigned int cols, unsigned int index)
+{
+	int** buffer = new int* [rows + 1]{};
+	if (index >= rows) return arr;
+	for (int i = 0, k = 0; i < rows; i++, k++)
+	{
+		if (i == index)k++;
+		buffer[k] = arr[i];
+	}
+	delete[] arr;
+	arr = buffer;
+	arr[index] = new int[cols] {};
+	rows++;
+	return arr;
+}
+int** pop_row_back(int** arr, unsigned int& rows, unsigned int cols)
+{
+	int** buffer = new int* [--rows]{};
+	for (int i = 0; i < rows; i++)
+	{
+		buffer[i] = arr[i];
+	}
+	delete[] arr;
+	arr = buffer;
+	return arr;
+}
+int** pop_row_front(int** arr, unsigned int& rows, unsigned int cols)
+{
+	int** buffer = new int* [--rows]{};
+	for (int i = 0; i < rows; i++)
+	{
+		buffer[i] = arr[i+1];
+	}
+	delete[] arr;
+	arr = buffer;
+	return arr;
+}
+int** pop_row_erase(int** arr, unsigned int& rows, unsigned int cols, unsigned int index)
+{
+	if (index > (rows - 1)) return arr;
+	int** buffer = new int*[--rows];
+	for (int i = 0, k = 0; i < rows; i++)
+	{
+		if (i == index) k++;
+		buffer[i] = arr[i + k];
+	}
+	delete[]arr;
+	arr = buffer;
 	return arr;
 }
