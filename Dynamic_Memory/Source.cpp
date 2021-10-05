@@ -3,12 +3,15 @@ using std::cin;
 using std::cout;
 using std::endl;
 
-char** allocate(const unsigned int rows, const unsigned int cols);
+template<typename T>
+T** allocate(const unsigned int rows, const unsigned int cols);
 template<typename T>
 void clear(T** arr, const unsigned int rows);
 
 void FillRand(char arr[], const unsigned int n);
+void FillRand(double arr[], const unsigned int n, int minRand, int maxRand);
 void FillRand(char** arr, const unsigned int rows, const unsigned int cols);
+void FillRand(double** arr, const unsigned int rows, const unsigned int cols, int minRand, int maxRand);
 template<typename T>
 void Print(T arr[], const unsigned int n);
 template<typename T>
@@ -104,7 +107,7 @@ void main()
 	unsigned int cols;
 	cout << "Введите количество строк: "; cin >> rows;
 	cout << "Введите количество элементов строки: "; cin >> cols;
-	char** arr = allocate(rows, cols);
+	double** arr = allocate<double>(rows, cols);
 	FillRand(arr, rows, cols);
 	Print(arr, rows, cols);
 	cout << "ДДМ с добавленной в конец строкой: " << endl;
@@ -121,7 +124,7 @@ void main()
 	cout << "Введите значение индекса для добавления строки: " << endl; cin >> index;
 	cout << "ДДМ с добавленной по индексу строкой: " << endl;
 	arr = push_row_insert(arr, rows, cols, index);
-	FillRand(arr[index], cols);//заполняем значениями только новую добавленную строку
+	if (index <= rows)FillRand(arr[index], cols);//заполняем значениями только новую добавленную строку
 	Print(arr, rows, cols);
 
 	cout << "ДДМ с удаленной последней строкой: " << endl;
@@ -166,22 +169,22 @@ void main()
 	cout << "Двумерный массив с удаленным по номеру столбцом: " << endl;
 	pop_col_erase(arr, rows, cols, number_col);
 	Print(arr, rows, cols);
-	
+
 	clear(arr, rows);
 #endif // DEBUG
 
 }
-
-char** allocate(const unsigned int rows, const unsigned int cols)
+template<typename T>
+T** allocate(const unsigned int rows, const unsigned int cols)
 {
 	//Объявление двумерного динамического массива:
 		//1) Объявляем указатель на указатель и сохрнаяем в него адрес массива указателей
 
-	char** arr = new char* [rows];
+	T** arr = new T * [rows];
 	//2) Создаем строки ДДМ:
 	for (int i = 0; i < rows; i++)
 	{
-		arr[i] = new char[cols] {};
+		arr[i] = new T[cols]{};
 	}
 	return arr;
 }
@@ -201,7 +204,18 @@ void FillRand(char arr[], const unsigned int n)
 {
 	for (int i = 0; i < n; i++)
 	{
-		arr[i] = rand() % 255;
+		arr[i] = rand();
+	}
+
+}
+void FillRand(double arr[], const unsigned int n, int minRand, int maxRand)
+{
+	minRand *= 100;
+	maxRand *= 100;
+	for (int i = 0; i < n; i++)
+	{
+		arr[i] = rand() % (maxRand - minRand) + minRand;
+		arr[i] /= 100;
 	}
 
 }
@@ -211,7 +225,21 @@ void FillRand(char** arr, const unsigned int rows, const unsigned int cols)
 	{
 		for (int j = 0; j < cols; j++)
 		{
-			arr[i][j] = rand() % 255;
+			arr[i][j] = rand();
+		}
+	}
+}
+void FillRand(double** arr, const unsigned int rows, const unsigned int cols, int minRand, int maxRand)
+{
+
+	minRand *= 100;
+	maxRand *= 100;
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < cols; j++)
+		{
+			arr[i][j] = rand() % (maxRand - minRand) + minRand;
+			arr[i][j] /= 100;
 		}
 	}
 }
@@ -366,7 +394,7 @@ T** push_row_insert(T** arr, unsigned int& rows, unsigned int cols, unsigned int
 {
 	if (index > (rows - 1)) return arr;
 	T** buffer = new T * [rows + 1]{};
-	for (int i = 0, k = 0; i < rows; i++,k++)
+	for (int i = 0, k = 0; i < rows; i++, k++)
 	{
 		if (i == index)k++;
 		buffer[k] = arr[i];
