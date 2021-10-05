@@ -37,7 +37,8 @@ template<typename T>void pop_col_front(T** arr, unsigned int rows, unsigned int&
 template<typename T>T** pop_col_erase(T** arr, unsigned int rows, unsigned int& cols, unsigned int number_col);
 
 
-
+#define DATA_TYPE char
+typedef char DataType;
 //#define DYNAMIC_MEMORY_1
 #define DYNAMIC_MEMORY_2
 
@@ -87,7 +88,7 @@ void main()
 	unsigned int cols;
 	cout << "Введите количество строк: "; cin >> rows;
 	cout << "Введите количество элементов строки: "; cin >> cols;
-	double** arr = allocate<double>(rows, cols);
+	DataType** arr = allocate<DataType>(rows, cols);
 	FillRand(arr, rows, cols);
 	Print(arr, rows, cols);
 	cout << "ДДМ с добавленной в конец строкой: " << endl;
