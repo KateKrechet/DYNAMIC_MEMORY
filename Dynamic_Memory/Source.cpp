@@ -264,7 +264,7 @@ template<typename T>void Print(T** arr, const unsigned int rows, const unsigned 
 		cout << endl;
 	}
 }
-template<typename T>T* push_back(T arr[], int& n, T value)
+template<typename T>T* push_back(T arr[], unsigned int& n, T value)
 {
 	//добавление элемента в массив
 	//1)создаем буферный массив нужного размера
@@ -352,6 +352,7 @@ template<typename T>T* erase(T arr[], int& n, int index)
 }
 template<typename T>T** push_row_back(T** arr, unsigned int& rows, unsigned int cols)
 {
+#ifdef OLD
 	//1)создаем буферный массив указателей
 	T** buffer = new T * [rows + 1]{};
 	//2) копируем адреса строк в буферный массив указателей
@@ -364,6 +365,8 @@ template<typename T>T** push_row_back(T** arr, unsigned int& rows, unsigned int 
 	arr[rows] = new T[cols]{};
 	rows++;
 	return arr;
+#endif // OLD
+	return push_back(arr, rows, new T[cols]{});
 }
 template<typename T>T** push_row_front(T** arr, unsigned int& rows, unsigned int cols)
 {
@@ -438,6 +441,7 @@ template<typename T>void push_col_back(T** arr, unsigned int rows, unsigned int&
 {
 	for (int i = 0; i < rows; i++)
 	{
+#ifdef OLD
 		//1)создаем буферную строку размером на 1 элемент больше
 		T* buffer = new T[cols + 1]{};
 		//2)копируем исходную строку в буферную
@@ -449,6 +453,9 @@ template<typename T>void push_col_back(T** arr, unsigned int rows, unsigned int&
 		//3)удаляем исходную строку
 		delete[] arr[i];
 		arr[i] = buffer;
+#endif // OLD
+		arr[i] = push_back(arr[i], cols,T());//T()-значение по умолчанию для типа Т
+		cols--;
 
 	}
 	//4) после того, как в каждой строке добавилось по элементу кол-во столбцов увеличилось на 1
