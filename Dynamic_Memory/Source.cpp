@@ -1,4 +1,6 @@
 ﻿#include<iostream>
+#include "Dynamic_Memory_1D.h"
+#include "DynamicMemory_1D.cpp"
 using std::cin;
 using std::cout;
 using std::endl;
@@ -14,13 +16,6 @@ void FillRand(int** arr, const unsigned int rows, const unsigned int cols, int m
 void FillRand(double** arr, const unsigned int rows, const unsigned int cols, int minRand = 0, int maxRand = 100);
 template<typename T>void Print(T arr[], const unsigned int n);
 template<typename T>void Print(T** arr, const unsigned int rows, const unsigned int cols);
-
-template<typename T>T* push_back(T arr[], int& n, T value);
-template<typename T>T* push_front(T arr[], int& n, T value);
-template<typename T>T* push_insert(T arr[], int& n, T value, int index);
-template<typename T>T* pop_back(T arr[], int& n);
-template<typename T>T* pop_front(T arr[], int& n);
-template<typename T>T* erase(T arr[], int& n, int index);
 
 template<typename T>T** push_row_back(T** arr, unsigned int& rows, unsigned int cols);
 template<typename T>T** push_row_front(T** arr, unsigned int& rows, unsigned int cols);
@@ -264,92 +259,7 @@ template<typename T>void Print(T** arr, const unsigned int rows, const unsigned 
 		cout << endl;
 	}
 }
-template<typename T>T* push_back(T arr[], unsigned int& n, T value)
-{
-	//добавление элемента в массив
-	//1)создаем буферный массив нужного размера
-	T* buffer = new T[n + 1];
-	//копируем исходный массив в буферный
-	for (int i = 0; i < n; i++)
-	{
-		buffer[i] = arr[i];
-	}
-	//3)удалить исходный массив
-	delete[] arr;
-	//4)подменем исходный массив новым (буферным) массивом, за счет подмены адреса
-	arr = buffer;
-	//5)Только после всех этих действий можно добавить значние в конец массива
-	arr[n] = value;
-	//6)После добавления элемента в массив количество его элементов увеличивается на 1
-	n++;
-	return arr;
-}
-template<typename T>T* push_front(T arr[], int& n, T value)
-{
-	T* buffer = new T[n + 1];
-	for (int i = 0; i < n; i++)
-	{
-		buffer[i + 1] = arr[i];
-	}
-	delete[]arr;
-	arr = buffer;
-	arr[0] = value;
-	n++;
-	return arr;
-}
-template<typename T>T* push_insert(T arr[], int& n, T value, int index)
-{
-	if (index >= n) return arr;
-	T* buffer = new T[n + 1];
-	for (int i = 0, k = 0; i < n; i++, k++)
-	{
-		if (i == index)k++;
-		buffer[k] = arr[i];
-	}
-	delete[] arr;
-	arr = buffer;
-	arr[index] = value;
-	n++;
-	return arr;
-}
-template<typename T>T* pop_back(T arr[], int& n)
-{
-	T* buffer = new T[n - 1];
-	for (int i = 0; i < n - 1; i++)
-	{
-		buffer[i] = arr[i];
-	}
-	delete[]arr;
-	arr = buffer;
-	n--;
-	return arr;
-}
-template<typename T>T* pop_front(T arr[], int& n)
-{
-	T* buffer = new T[n - 1];
-	for (int i = 0; i < n; i++)
-	{
-		buffer[i] = arr[i + 1];
-	}
-	delete[] arr;
-	arr = buffer;
-	n--;
-	return arr;
-}
-template<typename T>T* erase(T arr[], int& n, int index)
-{
-	if (index > (n - 1)) return arr;
-	T* buffer = new T[n - 1];
-	for (int i = 0, k = 0; i < n; i++)
-	{
-		if (i == index) k++;
-		buffer[i] = arr[i + k];
-	}
-	delete[]arr;
-	arr = buffer;
-	n--;
-	return arr;
-}
+
 template<typename T>T** push_row_back(T** arr, unsigned int& rows, unsigned int cols)
 {
 #ifdef OLD
@@ -370,6 +280,7 @@ template<typename T>T** push_row_back(T** arr, unsigned int& rows, unsigned int 
 }
 template<typename T>T** push_row_front(T** arr, unsigned int& rows, unsigned int cols)
 {
+#ifdef OLD
 	//1)создаем буферный массив указателей
 	T** buffer = new T * [rows + 1]{};
 	//2) копируем адреса строк в буферный массив указателей
@@ -382,9 +293,13 @@ template<typename T>T** push_row_front(T** arr, unsigned int& rows, unsigned int
 	arr[0] = new T[cols]{};
 	rows++;
 	return arr;
+#endif // OLD
+	return push_front(arr, rows, new T[cols]{});
+
 }
 template<typename T>T** push_row_insert(T** arr, unsigned int& rows, unsigned int cols, unsigned int index)
 {
+#ifdef OLD
 	if (index > (rows - 1)) return arr;
 	T** buffer = new T * [rows + 1]{};
 	for (int i = 0, k = 0; i < rows; i++, k++)
@@ -397,9 +312,14 @@ template<typename T>T** push_row_insert(T** arr, unsigned int& rows, unsigned in
 	arr[index] = new T[cols]{};
 	rows++;
 	return arr;
+#endif // OLD
+
+	return push_insert(arr, rows, new T[cols]{}, index);
+
 }
 template<typename T>T** pop_row_back(T** arr, unsigned int& rows, unsigned int cols)
 {
+#ifdef OLD
 	T** buffer = new T * [--rows]{};
 	for (int i = 0; i < rows; i++)
 	{
@@ -409,9 +329,13 @@ template<typename T>T** pop_row_back(T** arr, unsigned int& rows, unsigned int c
 	delete[] arr;
 	arr = buffer;
 	return arr;
+#endif // OLD
+
+	return pop_back(arr, rows);
 }
 template<typename T>T** pop_row_front(T** arr, unsigned int& rows, unsigned int cols)
 {
+#ifdef OLD
 	T** buffer = new T * [--rows]{};
 	for (int i = 0; i < rows; i++)
 	{
@@ -421,9 +345,13 @@ template<typename T>T** pop_row_front(T** arr, unsigned int& rows, unsigned int 
 	delete[] arr;
 	arr = buffer;
 	return arr;
+#endif // OLD
+
+	return pop_front(arr, rows);
 }
 template<typename T>T** pop_row_erase(T** arr, unsigned int& rows, unsigned int cols, unsigned int index)
 {
+#ifdef OLD
 	if (index > (rows - 1)) return arr;
 	T** buffer = new T * [--rows];
 	for (int i = 0, k = 0; i < rows; i++)
@@ -435,6 +363,9 @@ template<typename T>T** pop_row_erase(T** arr, unsigned int& rows, unsigned int 
 	delete[]arr;
 	arr = buffer;
 	return arr;
+#endif // OLD
+
+	return erase(arr, rows, index);
 }
 
 template<typename T>void push_col_back(T** arr, unsigned int rows, unsigned int& cols)
@@ -454,7 +385,7 @@ template<typename T>void push_col_back(T** arr, unsigned int rows, unsigned int&
 		delete[] arr[i];
 		arr[i] = buffer;
 #endif // OLD
-		arr[i] = push_back(arr[i], cols,T());//T()-значение по умолчанию для типа Т
+		arr[i] = push_back(arr[i], cols, T());//T()-значение по умолчанию для типа Т
 		cols--;
 
 	}
@@ -465,6 +396,7 @@ template<typename T>void push_col_front(T** arr, unsigned int rows, unsigned int
 {
 	for (int i = 0; i < rows; i++)
 	{
+#ifdef OLD
 		T* buffer = new T[cols + 1]{};
 		for (int j = 0; j < cols; j++)
 		{
@@ -472,6 +404,9 @@ template<typename T>void push_col_front(T** arr, unsigned int rows, unsigned int
 		}
 		delete[] arr[i];
 		arr[i] = buffer;
+#endif // OLD
+		arr[i] = push_front(arr[i], cols, T());
+		cols--;
 	}
 	cols++;
 }
@@ -479,6 +414,7 @@ template<typename T>T** push_col_insert(T** arr, unsigned int rows, unsigned int
 {
 	for (int i = 0; i < rows; i++)
 	{
+#ifdef OLD
 		if (number_col > cols) return arr;
 		T* buffer = new T[cols + 1]{};
 		for (int j = 0, k = 0; j < cols; j++, k++)
@@ -488,7 +424,10 @@ template<typename T>T** push_col_insert(T** arr, unsigned int rows, unsigned int
 		}
 		delete[] arr[i];
 		arr[i] = buffer;
+#endif // OLD
 
+		arr[i] = push_insert(arr[i], cols, T(), number_col);
+		cols--;
 	}
 	cols++;
 	return arr;
@@ -497,6 +436,7 @@ template<typename T>void pop_col_back(T** arr, unsigned int rows, unsigned int& 
 {
 	for (int i = 0; i < rows; i++)
 	{
+#ifdef OLD
 		T* buffer = new T[cols - 1]{};
 		for (int j = 0; j < cols - 1; j++)
 		{
@@ -504,6 +444,10 @@ template<typename T>void pop_col_back(T** arr, unsigned int rows, unsigned int& 
 		}
 		delete[] arr[i];
 		arr[i] = buffer;
+#endif // OLD
+
+		arr[i] = pop_back(arr[i], cols);
+		cols++;
 	}
 	cols--;
 
@@ -512,6 +456,7 @@ template<typename T>void pop_col_front(T** arr, unsigned int rows, unsigned int&
 {
 	for (int i = 0; i < rows; i++)
 	{
+#ifdef OLD
 		T* buffer = new T[cols - 1]{};
 		for (int j = 0; j < cols - 1; j++)
 		{
@@ -519,7 +464,9 @@ template<typename T>void pop_col_front(T** arr, unsigned int rows, unsigned int&
 		}
 		delete[] arr[i];
 		arr[i] = buffer;
-
+#endif // OLD
+		arr[i] = pop_front(arr[i], cols);
+		cols++;
 	}
 	cols--;
 }
@@ -528,6 +475,7 @@ template<typename T>T** pop_col_erase(T** arr, unsigned int rows, unsigned int& 
 	if (number_col > cols - 1) return arr;
 	for (int i = 0; i < rows; i++)
 	{
+#ifdef OLD
 		T* buffer = new T[cols - 1]{};
 		for (int j = 0, k = 0; j < cols - 1; j++)
 		{
@@ -536,10 +484,10 @@ template<typename T>T** pop_col_erase(T** arr, unsigned int rows, unsigned int& 
 		}
 		delete[] arr[i];
 		arr[i] = buffer;
-
+#endif // OLD
+		arr[i] = erase(arr[i], cols, number_col);
+		cols++;
 	}
 	cols--;
 	return arr;
 }
-
-
